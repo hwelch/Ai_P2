@@ -1,5 +1,6 @@
 import csv
 import numpy as np
+import random
 
 
 class Iris:
@@ -10,6 +11,7 @@ class Iris:
         self.petal_width = petal_width
         self.species = species
 
+
 # list of Iris data points
 
 
@@ -19,12 +21,11 @@ def parse_csv():
         irises = []
         for row in reader:
             if row[0] != 'sepal_length':
-                irises.append(Iris(row[0], row[1], row[2], row[3], row[4]))
+                irises.append(Iris(float(row[0]), float(row[1]), float(row[2]), float(row[3]), row[4]))
         return irises
 
 
 data = np.array(parse_csv())
-print(data)
 
 # global vars
 k = 1
@@ -76,3 +77,78 @@ def classify_data():
     return total
 
 
+def calculate_mean(dataset, mean_num):
+    total_sepal_length = 0
+    total_sepal_width = 0
+    total_petal_length = 0
+    total_petal_width = 0
+    for datapt in dataset:
+        total_sepal_width += datapt.sepal_width
+        total_sepal_length += datapt.sepal_length
+        total_petal_width += datapt.petal_length
+        total_petal_length += datapt.petal_length
+
+    total_size = float(dataset.size)
+    avg_sepal_length = total_sepal_length / total_size
+    avg_sepal_width = total_sepal_width / total_size
+    avg_petal_length = total_petal_length / total_size
+    avg_petal_width = total_petal_width / total_size
+
+    return Iris(avg_sepal_length, avg_sepal_width, avg_petal_length, avg_petal_width, mean_num)
+
+
+# the learning rule for the data
+def update_means():
+    count = 0
+    updated_means = []
+    while count < k:
+        if count == 0:
+            mu0 = calculate_mean(data_k0, "mu")
+            updated_means.append(mu0)
+        if count == 1:
+            mu1 = calculate_mean(data_k1, "mu")
+            updated_means.append(mu1)
+        if count == 2:
+            mu2 = calculate_mean(data_k2, "mu")
+            updated_means.append(mu2)
+        count += 1
+    return updated_means
+
+
+def calculate_kmeans(kclusters):
+    # initiate k and mus
+    global k
+    k = kclusters
+    count = 0
+    global mus
+    indexes = []
+    initial_mus = []
+    while count < k:
+        index = random.randint(0, data.size - 1)
+        if not indexes.__contains__(index):
+            datapt = data[index]
+            print(datapt.sepal_length)
+            datapt.species = "mu"
+            initial_mus.append(datapt)
+        count += 1
+    mus = initial_mus
+    # initialize a np array and append a new d every time you iterate
+    distortions = []
+    # breakpoint is when it converges or when difference in classify data = 0
+    prev_distortion = -1
+    curr_distortion = classify_data()
+    # recursively classify data and update means
+    while prev_distortion != curr_distortion:
+        distortions.append(curr_distortion)
+        print(curr_distortion)
+        prev_distortion = curr_distortion
+        mus = np.array(update_means())
+        global data_k0
+        global data_k1
+        global data_k2
+        data_k0 = np.array([])
+        data_k1 = np.array([])
+        data_k2 = np.array([])
+        curr_distortion = classify_data()
+
+calculate_kmeans(3)
