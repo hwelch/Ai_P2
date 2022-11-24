@@ -1,6 +1,7 @@
 import csv
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
 
 class Iris:
@@ -123,6 +124,17 @@ def update_means():
     return updated_means
 
 
+def plot_displacement(displacement):
+    d = np.array(displacement)
+    len = d.size
+    # evenly sampled time for each iteration
+    iterations = np.arange(0., len, 1.0)
+    plt.scatter(iterations, d)
+    plt.ylabel('Iterations')
+    plt.xlabel('Objective Function')
+    plt.title('Function of Iterations')
+    plt.show()
+
 def calculate_kmeans(kclusters):
     # initiate k and mus
     global k
@@ -144,12 +156,9 @@ def calculate_kmeans(kclusters):
     # breakpoint is when it converges or when difference in classify data = 0
     prev_distortion = -1
     curr_distortion = classify_data()
+    distortions.append(curr_distortion)
     # recursively classify data and update means
-    for m in mus:
-        print(m)
     while prev_distortion != curr_distortion:
-        distortions.append(curr_distortion)
-        print(prev_distortion, " / ", curr_distortion)
         prev_distortion = curr_distortion
         mus = np.array(update_means())
         global data_k0
@@ -159,7 +168,8 @@ def calculate_kmeans(kclusters):
         data_k1 = np.array([])
         data_k2 = np.array([])
         curr_distortion = classify_data()
-    print(prev_distortion, " / ", curr_distortion)
+        distortions.append(curr_distortion)
+    plot_displacement(distortions)
 
 
 calculate_kmeans(3)
