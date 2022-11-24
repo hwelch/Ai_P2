@@ -11,6 +11,8 @@ class Iris:
         self.petal_width = petal_width
         self.species = species
 
+    def __str__(self):
+        return f'sl: {self.sepal_length} sw: {self.sepal_width} pl: {self.petal_length} pw: {self.petal_width} species: {self.species}'
 
 # list of Iris data points
 
@@ -77,7 +79,7 @@ def classify_data():
     return total
 
 
-def calculate_mean(dataset, mean_num):
+def calculate_mean(dataset, mean_num, count):
     total_sepal_length = 0
     total_sepal_width = 0
     total_petal_length = 0
@@ -85,14 +87,20 @@ def calculate_mean(dataset, mean_num):
     for datapt in dataset:
         total_sepal_width += datapt.sepal_width
         total_sepal_length += datapt.sepal_length
-        total_petal_width += datapt.petal_length
+        total_petal_width += datapt.petal_width
         total_petal_length += datapt.petal_length
 
     total_size = float(dataset.size)
-    avg_sepal_length = total_sepal_length / total_size
-    avg_sepal_width = total_sepal_width / total_size
-    avg_petal_length = total_petal_length / total_size
-    avg_petal_width = total_petal_width / total_size
+    if total_size != 0:
+        avg_sepal_length = total_sepal_length / total_size
+        avg_sepal_width = total_sepal_width / total_size
+        avg_petal_length = total_petal_length / total_size
+        avg_petal_width = total_petal_width / total_size
+    else:
+        avg_sepal_length = mus[count].sepal_length
+        avg_sepal_width = mus[count].sepal_width
+        avg_petal_length = mus[count].petal_length
+        avg_petal_width = mus[count].petal_width
 
     return Iris(avg_sepal_length, avg_sepal_width, avg_petal_length, avg_petal_width, mean_num)
 
@@ -103,13 +111,13 @@ def update_means():
     updated_means = []
     while count < k:
         if count == 0:
-            mu0 = calculate_mean(data_k0, "mu")
+            mu0 = calculate_mean(data_k0, "mu", count)
             updated_means.append(mu0)
         if count == 1:
-            mu1 = calculate_mean(data_k1, "mu")
+            mu1 = calculate_mean(data_k1, "mu", count)
             updated_means.append(mu1)
         if count == 2:
-            mu2 = calculate_mean(data_k2, "mu")
+            mu2 = calculate_mean(data_k2, "mu", count)
             updated_means.append(mu2)
         count += 1
     return updated_means
@@ -127,7 +135,6 @@ def calculate_kmeans(kclusters):
         index = random.randint(0, data.size - 1)
         if not indexes.__contains__(index):
             datapt = data[index]
-            print(datapt.sepal_length)
             datapt.species = "mu"
             initial_mus.append(datapt)
         count += 1
@@ -138,9 +145,11 @@ def calculate_kmeans(kclusters):
     prev_distortion = -1
     curr_distortion = classify_data()
     # recursively classify data and update means
+    for m in mus:
+        print(m)
     while prev_distortion != curr_distortion:
         distortions.append(curr_distortion)
-        print(curr_distortion)
+        print(prev_distortion, " / ", curr_distortion)
         prev_distortion = curr_distortion
         mus = np.array(update_means())
         global data_k0
@@ -150,5 +159,7 @@ def calculate_kmeans(kclusters):
         data_k1 = np.array([])
         data_k2 = np.array([])
         curr_distortion = classify_data()
+    print(prev_distortion, " / ", curr_distortion)
+
 
 calculate_kmeans(3)
