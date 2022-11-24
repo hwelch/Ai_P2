@@ -63,7 +63,16 @@ def place_data(x, cluster):
 
 
 # the objective function both sums the total distortion and classifies the data
-def classify_data():
+def objective_function():
+    # reset the cluster before each new objective function call
+    global data_k0
+    global data_k1
+    global data_k2
+    data_k0 = np.array([])
+    data_k1 = np.array([])
+    data_k2 = np.array([])
+
+    # add the total displacement for the data and place into clusters
     total = 0
     for datapt in data:
         count = 0
@@ -124,6 +133,7 @@ def update_means():
     return updated_means
 
 
+# plotting function to plot the objective function as a function of iterations
 def plot_displacement(displacement):
     d = np.array(displacement)
     len = d.size
@@ -135,7 +145,45 @@ def plot_displacement(displacement):
     plt.title('Function of Iterations')
     plt.show()
 
-def calculate_kmeans(kclusters):
+
+# function to plot an overlay of clusters on the data
+def plot_overlay(title):
+    # initialize arrays to place data in
+    setosa_w = []
+    setosa_l = []
+    versicolor_w = []
+    versicolor_l = []
+    virginica_w = []
+    virginica_l = []
+    means_w = []
+    means_l = []
+    means_size = []
+    for d in data:
+        if d.species == "setosa":
+            setosa_l.append(d.petal_length)
+            setosa_w.append(d.petal_width)
+        if d.species == "versicolor":
+            versicolor_l.append(d.petal_length)
+            versicolor_w.append(d.petal_width)
+        if d.species == "virginica":
+            virginica_l.append(d.petal_length)
+            virginica_w.append(d.petal_width)
+    for mu in mus:
+        means_l.append(mu.petal_length)
+        means_w.append(mu.petal_width)
+        means_size.append(200)
+    plt.scatter(np.array(setosa_l), np.array(setosa_w), label="setosa")
+    plt.scatter(np.array(versicolor_l), np.array(versicolor_w), label="versicolor")
+    plt.scatter(np.array(virginica_l), np.array(virginica_w), label="virginica")
+    plt.scatter(np.array(means_l), np.array(means_w), np.array(means_size), label="mu", marker=(5, 1))
+    plt.ylabel('Petal Width')
+    plt.xlabel('Petal Length')
+    plt.title(title)
+    plt.legend()
+    plt.show()
+
+
+def calculate_kmeans(kclusters, plot_ptb, plot_ptc):
     # initiate k and mus
     global k
     k = kclusters
@@ -151,25 +199,31 @@ def calculate_kmeans(kclusters):
             initial_mus.append(datapt)
         count += 1
     mus = initial_mus
-    # initialize a np array and append a new d every time you iterate
+    # initialize an array and append a new d every time you iterate (FOR PT B)
     distortions = []
     # breakpoint is when it converges or when difference in classify data = 0
     prev_distortion = -1
-    curr_distortion = classify_data()
+    curr_distortion = objective_function()
     distortions.append(curr_distortion)
+    iteration = 1  # keep track of internal iterations for part c
+    if plot_ptc:
+        plot_overlay(f'k={k} Clusters: Initial')
     # recursively classify data and update means
     while prev_distortion != curr_distortion:
-        prev_distortion = curr_distortion
-        mus = np.array(update_means())
-        global data_k0
-        global data_k1
-        global data_k2
-        data_k0 = np.array([])
-        data_k1 = np.array([])
-        data_k2 = np.array([])
-        curr_distortion = classify_data()
-        distortions.append(curr_distortion)
-    plot_displacement(distortions)
+        prev_distortion = curr_distortion  # update the previous distortion
+        mus = np.array(update_means())  # update the means
+        curr_distortion = objective_function()  # update the current distortion
+        distortions.append(curr_distortion)  # add it to the list of distortions
+        if plot_ptc:
+            plot_overlay(f'k={k} Clusters: Intermediate (Iteration {iteration})')
+        iteration += 1
+    if plot_ptb:
+        plot_displacement(distortions)
+    if plot_ptc:
+        plot_overlay(f'k={k} Clusters: Converged')
+        print(curr_distortion)
 
 
-calculate_kmeans(3)
+# calculate_kmeans(3, True, False)
+# calculate_kmeans(3, False, True)
+# calculate_kmeans(2, False, True)
