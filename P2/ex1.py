@@ -146,8 +146,18 @@ def plot_displacement(displacement):
     plt.show()
 
 
+# function to get y for the decision boundaries i.e. perpendicular line formula at midpoint at a given point x
+def calculate_decision_bounds(pt1_x, pt1_y, pt2_x, pt2_y, x):
+    midpt_x = (pt2_x + pt1_x) / 2
+    midpt_y = (pt1_y + pt2_y) / 2
+    slope = (pt2_y - pt1_y) / (pt2_x - pt1_x)
+    perp_slope = -1 / slope
+    b = midpt_y - (perp_slope * midpt_x)
+    return (perp_slope * x) + b
+
+
 # function to plot an overlay of clusters on the data
-def plot_overlay(title):
+def plot_overlay(title, plot_decision_boundaries):
     # initialize arrays to place data in
     setosa_w = []
     setosa_l = []
@@ -176,14 +186,30 @@ def plot_overlay(title):
     plt.scatter(np.array(versicolor_l), np.array(versicolor_w), label="versicolor")
     plt.scatter(np.array(virginica_l), np.array(virginica_w), label="virginica")
     plt.scatter(np.array(means_l), np.array(means_w), np.array(means_size), label="mu", marker=(5, 1))
+    if plot_decision_boundaries:
+        # sort the means
+        ordered_means = sorted(mus, key=lambda x: x.petal_length, reverse=False)
+        for e in ordered_means:
+            print(e)
+        # keep calculating lines between means while there are means there
+        i = 0
+        x = np.arange(0, 7, 0.01)
+        while i < mus.size - 1:
+            y = calculate_decision_bounds(ordered_means[i].petal_length, ordered_means[i].petal_width,
+                                          ordered_means[i + 1].petal_length, ordered_means[i + 1].petal_width, x)
+            plt.plot(x, y, color='black', label='Decision Bound' if i == 0 else "")
+            i += 1
+
     plt.ylabel('Petal Width')
     plt.xlabel('Petal Length')
     plt.title(title)
     plt.legend()
+    plt.xlim([0, 7.1])
+    plt.ylim(0, 2.6)
     plt.show()
 
 
-def calculate_kmeans(kclusters, plot_ptb, plot_ptc):
+def calculate_kmeans(kclusters, part_to_plot):
     # initiate k and mus
     global k
     k = kclusters
@@ -206,24 +232,30 @@ def calculate_kmeans(kclusters, plot_ptb, plot_ptc):
     curr_distortion = objective_function()
     distortions.append(curr_distortion)
     iteration = 1  # keep track of internal iterations for part c
-    if plot_ptc:
-        plot_overlay(f'k={k} Clusters: Initial')
+    if part_to_plot == 'c':
+        plot_overlay(f'k={k} Clusters: Initial', False)
     # recursively classify data and update means
     while prev_distortion != curr_distortion:
         prev_distortion = curr_distortion  # update the previous distortion
         mus = np.array(update_means())  # update the means
         curr_distortion = objective_function()  # update the current distortion
         distortions.append(curr_distortion)  # add it to the list of distortions
-        if plot_ptc:
-            plot_overlay(f'k={k} Clusters: Intermediate (Iteration {iteration})')
+        if part_to_plot == 'c':
+            plot_overlay(f'k={k} Clusters: Intermediate (Iteration {iteration})', False)
         iteration += 1
-    if plot_ptb:
+    if part_to_plot == 'b':
         plot_displacement(distortions)
-    if plot_ptc:
-        plot_overlay(f'k={k} Clusters: Converged')
+    if part_to_plot == 'c':
+        plot_overlay(f'k={k} Clusters: Converged', False)
+        print(curr_distortion)
+    if part_to_plot == 'd':
+        plot_overlay(f'k={k} Clusters: Plot with Decision Boundaries', True)
         print(curr_distortion)
 
 
-# calculate_kmeans(3, True, False)
-# calculate_kmeans(3, False, True)
-# calculate_kmeans(2, False, True)
+calculate_kmeans(3, 'b')
+calculate_kmeans(3, 'c')
+calculate_kmeans(2, 'c')
+calculate_kmeans(3, 'd')
+calculate_kmeans(2, 'd')
+
