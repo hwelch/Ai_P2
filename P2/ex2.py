@@ -2,6 +2,7 @@ import csv
 import numpy as np
 import random
 import matplotlib.pyplot as plt
+import statistics
 
 
 class Iris:
@@ -36,13 +37,10 @@ w = np.array([])
 b = 0
 
 
-def get_avg(dataset):
-    arr = []
-    total_sum = 0
-    for d in dataset:
-        total_sum += d
-    arr.append(total_sum / len(dataset))
-    return arr
+def normalize_data(d):
+    mean = statistics.mean(d)
+    sd = statistics.stdev(d)
+    return (d - mean) / sd
 
 
 # function to bind weights and inputs together and find sum
@@ -54,12 +52,22 @@ def summation_function():
 def activation_function(z):
     return 1. / (1. + np.exp(-z))
 
-#function to get the sigmoid nonlinearity
+
+# function to get the sigmoid nonlinearity
 def get_nonlinearity():
     z = summation_function()
-    print(z)
     a = activation_function(z)
+    plt.scatter(z, a)
+    plt.ylabel('Sigmoid Output')
+    plt.xlabel('z')
+    plt.title("Normalized data")
+    plt.show()
     return a
+
+
+# function for pt e to compare data and sigmoid outputs
+def compare_data(dataset, outputs, index):
+    plt.scatter(dataset[index][1], dataset[index][2], 200, label=f'output: {outputs[index]}')
 
 
 # function to plot an overlay of clusters on the data
@@ -87,8 +95,11 @@ def plot_classes(title):
             updated_data.append(np.array([1, d.petal_length, d.petal_width]))
             exp_y.append(1)
     data = np.array(updated_data)
+    # normalize the data since we are just using this to calculate a probability
+    data[:, 1] = normalize_data(data[:, 1])
+    data[:, 2] = normalize_data(data[:, 2])
     expected_y = np.array(exp_y)
-    w = np.array([[0], get_avg(data[:, 1]), get_avg(data[:, 2])])
+    w = np.array([[0], [0.5], [0.5]])
     sigmoid = get_nonlinearity()
     plt.scatter(np.array(versicolor_l), np.array(versicolor_w), label="versicolor")
     plt.scatter(np.array(virginica_l), np.array(virginica_w), label="virginica")
