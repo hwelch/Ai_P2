@@ -28,12 +28,42 @@ def parse_csv():
         return irises
 
 
-data = np.array(parse_csv())
-
 # global vars
-k = 1
+data = np.array(parse_csv())
+expected_y = np.array([])
+k = 2
+w = np.array([])
+b = 0
+
+
+def get_avg(dataset):
+    arr = []
+    total_sum = 0
+    for d in dataset:
+        total_sum += d
+    arr.append(total_sum / len(dataset))
+    return arr
+
+
+# function to bind weights and inputs together and find sum
+def summation_function():
+    return np.dot(data, w)
+
+
+# activation function -- in this case sigmoid function
+def activation_function(z):
+    return 1. / (1. + np.exp(-z))
+
+#function to get the sigmoid nonlinearity
+def get_nonlinearity():
+    z = summation_function()
+    print(z)
+    a = activation_function(z)
+    return a
+
 
 # function to plot an overlay of clusters on the data
+# accounted for weights by setting x0 = 1 and for now b = 0
 def plot_classes(title):
     # initialize arrays to place data in
     versicolor_w = []
@@ -41,20 +71,27 @@ def plot_classes(title):
     virginica_w = []
     virginica_l = []
     updated_data = []
+    exp_y = []
     global data
+    global expected_y
+    global w
     for d in data:
         if d.species == "versicolor":
             versicolor_l.append(d.petal_length)
             versicolor_w.append(d.petal_width)
-            updated_data.append(d)
+            updated_data.append(np.array([1, d.petal_length, d.petal_width]))
+            exp_y.append(0)
         if d.species == "virginica":
             virginica_l.append(d.petal_length)
             virginica_w.append(d.petal_width)
-            updated_data.append(d)
-    data = updated_data
+            updated_data.append(np.array([1, d.petal_length, d.petal_width]))
+            exp_y.append(1)
+    data = np.array(updated_data)
+    expected_y = np.array(exp_y)
+    w = np.array([[0], get_avg(data[:, 1]), get_avg(data[:, 2])])
+    sigmoid = get_nonlinearity()
     plt.scatter(np.array(versicolor_l), np.array(versicolor_w), label="versicolor")
     plt.scatter(np.array(virginica_l), np.array(virginica_w), label="virginica")
-
     plt.ylabel('Petal Width')
     plt.xlabel('Petal Length')
     plt.title(title)
