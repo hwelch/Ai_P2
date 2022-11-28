@@ -2,8 +2,6 @@ import csv
 import numpy as np
 import random
 import matplotlib.pyplot as plt
-import statistics
-import time
 
 
 class Iris:
@@ -43,12 +41,6 @@ virginica_l = []
 raw_data = []
 
 
-def normalize_data(d):
-    mean = statistics.mean(d)
-    sd = statistics.stdev(d)
-    return (d - mean) / sd
-
-
 # function to bind weights and inputs together and find sum
 def summation_function():
     return np.dot(data, w)
@@ -62,12 +54,14 @@ def activation_function(z):
 # function to get the sigmoid nonlinearity
 def get_nonlinearity():
     z = summation_function()
+    print(z)
     a = activation_function(z)
-    # plt.scatter(z, a)
-    # plt.ylabel('Sigmoid Output')
-    # plt.xlabel('z')
-    # plt.title("Normalized data")
-    # plt.show()
+    print(a)
+    plt.scatter(z, a)
+    plt.ylabel('Sigmoid Output')
+    plt.xlabel('z')
+    plt.title("Normalized data")
+    plt.show()
     return a
 
 
@@ -75,6 +69,12 @@ def get_nonlinearity():
 def compare_data(dataset, outputs, index):
     plt.scatter(dataset[index][1], dataset[index][2], 150, color='maroon', label=f'output for index {index}: {outputs[index]}')
     print(f'index {index}:   petal_length = {dataset[index][1]} petal_width = {dataset[index][2]} and sigmoid output is {outputs[index]}')
+
+
+# function to plot approximate decision boundary based on weights
+def get_decision_boundary(x1):
+    x2 = -((w[1] * x1 + w[0]) / w[2])
+    return x2
 
 
 # initialize parameters
@@ -99,11 +99,8 @@ def initialize_params():
             raw_data.append(np.array([1, d.petal_length, d.petal_width]))
             exp_y.append(1)
     data = np.array(raw_data)
-    # normalize the data since we are just using this to calculate a probability
-    data[:, 1] = normalize_data(data[:, 1])
-    data[:, 2] = normalize_data(data[:, 2])
     expected_y = np.array(exp_y)
-    w = np.array([[0], [0.5], [0.5]])
+    w = np.array([[-8.8], [1.1], [2]])
 
 
 # function to plot an overlay of clusters on the data
@@ -117,14 +114,24 @@ def plot_classes(title, pt, index_for_e):
     plt.title(title)
     plt.xlim([2.90, 7.1])
     plt.ylim(0.9, 2.58)
+    if pt == 'c':
+        x_axis = np.arange(2.9, 7.1, 0.1)
+        plt.plot(x_axis, get_decision_boundary(x_axis), color='black', label="decision bounary")
     if pt == 'e':
         compare_data(np.array(raw_data), sigmoid, index_for_e)
     plt.legend()
     plt.show()
 
 
+def run_pt_e():
+    # indexing = np.arange(100)
+    # for i in indexing:
+    #     plot_classes("2nd and 3rd Classes", 'e', i)
+    #     time.sleep(1)
+    plot_classes("2nd and 3rd Classes", 'e', 7)
+    plot_classes("2nd and 3rd Classes", 'e', 85)
+
+
 initialize_params()
-indexing = np.arange(100)
-for i in indexing:
-    plot_classes("2nd and 3rd Classes", 'e', i)
-    time.sleep(1)
+plot_classes("2nd and 3rd Classes", 'c', 0)
+run_pt_e()
