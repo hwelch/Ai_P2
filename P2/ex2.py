@@ -94,6 +94,26 @@ def initialize_params():
     w = np.array([[-8.8], [1.1], [2]])
 
 
+# function to plot 3d graph for pt d
+def plot_3d():
+    z = get_nonlinearity()
+    out = []
+    for zz in z:
+        out.append(zz[0])
+    z = np.array(out)
+    x = data[:, 1]
+    y = data[:, 2]
+    fig = plt.figure(figsize=(8, 8))
+    ax = plt.axes(projection='3d')
+    # Creating plot
+    ax.plot_trisurf(x, y, z)
+    # show plot
+    ax.set_title('3D Plot')
+    ax.set_xlabel('Petal Length')
+    ax.set_ylabel('Petal Width')
+    ax.set_zlabel('Sigmoid Output')
+    plt.show()
+
 # function to plot an overlay of clusters on the data
 # accounted for weights by setting x0 = 1 and for now b = 0
 def plot_classes(title, pt, index_for_e):
@@ -124,5 +144,6 @@ def run_pt_e():
 
 
 initialize_params()
-plot_classes("2nd and 3rd Classes", 'c', 0)
+# plot_classes("2nd and 3rd Classes", 'c', 0)
 # run_pt_e()
+plot_3d()
