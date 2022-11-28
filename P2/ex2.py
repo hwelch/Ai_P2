@@ -2,7 +2,7 @@ import csv
 import numpy as np
 import random
 import matplotlib.pyplot as plt
-
+import time
 
 class Iris:
     def __init__(self, sepal_length, sepal_width, petal_length, petal_width, species):
@@ -54,27 +54,18 @@ def activation_function(z):
 # function to get the sigmoid nonlinearity
 def get_nonlinearity():
     z = summation_function()
-    print(z)
     a = activation_function(z)
-    print(a)
-    plt.scatter(z, a)
-    plt.ylabel('Sigmoid Output')
-    plt.xlabel('z')
-    plt.title("Normalized data")
-    plt.show()
     return a
 
 
 # function for pt e to compare data and sigmoid outputs
 def compare_data(dataset, outputs, index):
     plt.scatter(dataset[index][1], dataset[index][2], 150, color='maroon', label=f'output for index {index}: {outputs[index]}')
-    print(f'index {index}:   petal_length = {dataset[index][1]} petal_width = {dataset[index][2]} and sigmoid output is {outputs[index]}')
 
 
 # function to plot approximate decision boundary based on weights
 def get_decision_boundary(x1):
-    x2 = -((w[1] * x1 + w[0]) / w[2])
-    return x2
+    return -((w[1] * x1 + w[0]) / w[2])
 
 
 # initialize parameters
@@ -118,20 +109,20 @@ def plot_classes(title, pt, index_for_e):
         x_axis = np.arange(2.9, 7.1, 0.1)
         plt.plot(x_axis, get_decision_boundary(x_axis), color='black', label="decision bounary")
     if pt == 'e':
+        x_axis = np.arange(2.9, 7.1, 0.1)
+        plt.plot(x_axis, get_decision_boundary(x_axis), color='black', label="decision bounary")
         compare_data(np.array(raw_data), sigmoid, index_for_e)
     plt.legend()
     plt.show()
 
 
 def run_pt_e():
-    # indexing = np.arange(100)
-    # for i in indexing:
-    #     plot_classes("2nd and 3rd Classes", 'e', i)
-    #     time.sleep(1)
-    plot_classes("2nd and 3rd Classes", 'e', 7)
-    plot_classes("2nd and 3rd Classes", 'e', 85)
+    plot_classes("Versicolor (c = 1) Unambiguous", 'e', 7)
+    plot_classes("Versicolor (c = 1) Near Decision Boundary", 'e', 33)
+    plot_classes("Virginica  (c = 2) Unambiguous", 'e', 85)
+    plot_classes("Virginica  (c = 2) Near Decision Boundary", 'e', 77)
 
 
 initialize_params()
 plot_classes("2nd and 3rd Classes", 'c', 0)
-run_pt_e()
+# run_pt_e()
