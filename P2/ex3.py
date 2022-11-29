@@ -93,7 +93,7 @@ def initialize_params():
     w = np.array([[-8.8], [1.1], [2]])
 
 
-def plot_classes(title, w0, w1, w2, w0b, w1b, w2b):
+def plot_classes(title, w0, w1, w2, w0b, w1b, w2b, l1, l2):
     plt.scatter(np.array(versicolor_l), np.array(versicolor_w), label="versicolor")
     plt.scatter(np.array(virginica_l), np.array(virginica_w), label="virginica")
     plt.ylabel('Petal Width')
@@ -102,8 +102,8 @@ def plot_classes(title, w0, w1, w2, w0b, w1b, w2b):
     plt.xlim([2.90, 7.1])
     plt.ylim(0.9, 2.58)
     x_axis = np.arange(2.9, 7.1, 0.1)
-    plt.plot(x_axis, get_decision_boundary(x_axis, w0, w1, w2), color='black', label="Low Error")
-    plt.plot(x_axis, get_decision_boundary(x_axis, w0b, w1b, w2b), color='red', label="High Error")
+    plt.plot(x_axis, get_decision_boundary(x_axis, w0, w1, w2), color='black', label=l1)
+    plt.plot(x_axis, get_decision_boundary(x_axis, w0b, w1b, w2b), color='red', label=l2)
     plt.legend()
     plt.show()
 
@@ -135,7 +135,37 @@ def compute_for_weights():
     w1b = 5
     w2b = -18.5
     print(get_mean_squared(data, np.array([[w0b], [w1b], [w2b]]), expected_y))
-    plot_classes("Data with Error Graphs", w0, w1, w2, w0b, w1b, w2b)
+    plot_classes("Data with Error Graphs", w0, w1, w2, w0b, w1b, w2b, "Low Error", "High Error")
+
+
+# function to get the summed gradient for an ensemble of patterns
+def get_gradient(data_vectors, pattern_class):
+    a = get_nonlinearity()
+    y_exp = pattern_class
+    ones = np.ones(100)
+    unsummed_gradient = []
+    count = 0
+    while count < 100:
+        unsummed_gradient.append(data_vectors[count] * a[count] * (ones[count] - a[count]) * (a[count] - y_exp[count]))
+        count += 1
+    gradient = np.sum(np.array(unsummed_gradient), axis=0)
+    return gradient
+
+
+# function to update the weights based on the gradient
+def update_weights(data_vectors, weights, pattern_class, epsilon):
+    dw = get_gradient(data_vectors, pattern_class)
+    dw = np.array([[dw[0]], [dw[1]], [dw[2]]])
+    return weights - dw * epsilon
+
+
+# function to compare the updated weights and previous weights
+def plot_gradient():
+    print(get_mean_squared(data, w, expected_y))
+    w_new = update_weights(data, w, expected_y, 0.005)
+    print(get_mean_squared(data, w_new, expected_y))
+    plot_classes("Illustrate Gradient", w[0], w[1], w[2], w_new[0], w_new[1], w_new[2], "Old Weights", "New Weights")
 
 initialize_params()
-compute_for_weights()
+# compute_for_weights()
+plot_gradient()
