@@ -63,8 +63,8 @@ def compare_data(dataset, outputs, index):
 
 
 # function to plot approximate decision boundary based on weights
-def get_decision_boundary(x1):
-    return -((w[1] * x1 + w[0]) / w[2])
+def get_decision_boundary(x1, w0, w1, w2):
+    return -((w1 * x1 + w0) / w2)
 
 
 # initialize parameters
@@ -93,6 +93,21 @@ def initialize_params():
     w = np.array([[-8.8], [1.1], [2]])
 
 
+def plot_classes(title, w0, w1, w2, w0b, w1b, w2b):
+    plt.scatter(np.array(versicolor_l), np.array(versicolor_w), label="versicolor")
+    plt.scatter(np.array(virginica_l), np.array(virginica_w), label="virginica")
+    plt.ylabel('Petal Width')
+    plt.xlabel('Petal Length')
+    plt.title(title)
+    plt.xlim([2.90, 7.1])
+    plt.ylim(0.9, 2.58)
+    x_axis = np.arange(2.9, 7.1, 0.1)
+    plt.plot(x_axis, get_decision_boundary(x_axis, w0, w1, w2), color='black', label="Low Error")
+    plt.plot(x_axis, get_decision_boundary(x_axis, w0b, w1b, w2b), color='red', label="High Error")
+    plt.legend()
+    plt.show()
+
+
 # get the mean-squared error
 def get_mean_squared(data_vectors, weights, pattern_classes):
     global data, w
@@ -116,11 +131,11 @@ def compute_for_weights():
     print(get_mean_squared(data, np.array([[w0], [w1], [w2]]), expected_y))
     print("high error:")
     print("w0 = 2 w1 = 5 w2 = -18.5")
-    w0 = 2
-    w1 = 5
-    w2 = -18.5
-    print(get_mean_squared(data, np.array([[w0], [w1], [w2]]), expected_y))
-
+    w0b = 2
+    w1b = 5
+    w2b = -18.5
+    print(get_mean_squared(data, np.array([[w0b], [w1b], [w2b]]), expected_y))
+    plot_classes("Data with Error Graphs", w0, w1, w2, w0b, w1b, w2b)
 
 initialize_params()
 compute_for_weights()
