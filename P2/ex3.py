@@ -161,11 +161,11 @@ def update_weights(data_vectors, weights, pattern_class, epsilon):
 
 # function to compare the updated weights and previous weights
 def plot_gradient():
-    print(get_mean_squared(data, w, expected_y))
-    w_new = update_weights(data, w, expected_y, 0.005)
-    print(get_mean_squared(data, w_new, expected_y))
-    plot_classes("Illustrate Gradient", w[0], w[1], w[2], w_new[0], w_new[1], w_new[2], "Old Weights", "New Weights")
+    w_old = np.array([[-8.8], [1.1], [2]])
+    w_new = update_weights(data, w_old, expected_y, 0.005)
+    plot_classes("Illustrate Gradient", w_old[0], w_old[1], w_old[2], w_new[0], w_new[1], w_new[2], "Old Weights", "New Weights")
+
 
 initialize_params()
-# compute_for_weights()
+compute_for_weights()
 plot_gradient()
