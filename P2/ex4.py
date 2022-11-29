@@ -127,7 +127,7 @@ def update_weights(data_vectors, weights, pattern_class, epsilon):
     return weights - dw * epsilon
 
 
-def plot_classes(title, w0, w1, w2, w0b, w1b, w2b, l1, l2):
+def plot_classes(title, w0, w1, w2, l1):
     plt.scatter(np.array(versicolor_l), np.array(versicolor_w), label="versicolor")
     plt.scatter(np.array(virginica_l), np.array(virginica_w), label="virginica")
     plt.ylabel('Petal Width')
@@ -137,7 +137,6 @@ def plot_classes(title, w0, w1, w2, w0b, w1b, w2b, l1, l2):
     plt.ylim(0.9, 2.58)
     x_axis = np.arange(2.9, 7.1, 0.1)
     plt.plot(x_axis, get_decision_boundary(x_axis, w0, w1, w2), color='black', label=l1)
-    plt.plot(x_axis, get_decision_boundary(x_axis, w0b, w1b, w2b), color='red', label=l2)
     plt.legend()
     plt.show()
 
@@ -149,10 +148,42 @@ def plot_gradient():
     plot_classes("Illustrate Gradient", w_old[0], w_old[1], w_old[2], w_new[0], w_new[1], w_new[2], "Old Weights", "New Weights")
 
 
+# plot iterations
+def plot_iterations(x, y):
+    plt.ylabel('Error')
+    plt.xlabel('Iterations')
+    plt.title("Error Over Iterations")
+    plt.plot(x, y)
+    plt.show()
+
+
 # function to optimize the decision boundary through gradient decent
-def optimize_decision_boundary(initial_weights, epsilon, ):
-    return 1
+def optimize_decision_boundary(initial_weights, epsilon):
+    global w
+    w = initial_weights
+    errs = []
+    prev_diff = 10000000000
+    curr_diff = get_mean_squared(data, initial_weights, expected_y)
+    errs.append(curr_diff)
+    iterations = 1
+    print(curr_diff)
+    while prev_diff - curr_diff > 0.00001:
+        prev_diff = curr_diff
+        w_new = update_weights(data, w, expected_y, epsilon)
+        # get_mean_squared updates global w
+        curr_diff = get_mean_squared(data, w_new, expected_y)
+        errs.append(curr_diff)
+        iterations += 1
+        print(curr_diff)
+    plot_classes("Final Boundary", w[0], w[1], w[2], "Decision Boundary")
+    plot_iterations(np.arange(iterations), np.array(errs))
+
+
+# function to run and plot the optimize_decision_boundary function
+def run_neural_network(initial_weights, epsilon):
+    optimize_decision_boundary(initial_weights, epsilon)
 
 
 initialize_params()
-plot_gradient()
+# plot_gradient()
+optimize_decision_boundary(np.array([[-8.8], [1.1], [2]]), 0.005)
