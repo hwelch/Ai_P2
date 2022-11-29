@@ -91,3 +91,36 @@ def initialize_params():
     data = np.array(raw_data)
     expected_y = np.array(exp_y)
     w = np.array([[-8.8], [1.1], [2]])
+
+
+# get the mean-squared error
+def get_mean_squared(data_vectors, weights, pattern_classes):
+    global data, w
+    data = data_vectors
+    w = weights
+    summation = 0
+    y_actual = get_nonlinearity()
+    count = 0
+    while count < 100:
+        summation += (y_actual[count] - pattern_classes[count]) ** 2
+        count += 1
+    return summation / 2
+
+
+def compute_for_weights():
+    print("low error:")
+    print("w0 = -8.8, w1 = 1.1, w2 = 2")
+    w0 = -8.8
+    w1 = 1.1
+    w2 = 2
+    print(get_mean_squared(data, np.array([[w0], [w1], [w2]]), expected_y))
+    print("high error:")
+    print("w0 = 2 w1 = 5 w2 = -18.5")
+    w0 = 2
+    w1 = 5
+    w2 = -18.5
+    print(get_mean_squared(data, np.array([[w0], [w1], [w2]]), expected_y))
+
+
+initialize_params()
+compute_for_weights()
