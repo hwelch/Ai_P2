@@ -198,6 +198,20 @@ def optimize_decision_boundary(initial_weights, epsilon):
     plot_iterations(np.arange(iterations), np.array(errs))
 
 
+# function to get somewhat random numbers as weights
+def get_pseudo_random_weights():
+    w0 = -8.8
+    w1 = 1.1
+    w2 = 2
+    w0 += random.random()
+    w1 += random.random()
+    w2 += random.random()
+    return np.array([w0, w1, w2])
+
 initialize_params()
-# plot_gradient()
-optimize_decision_boundary(np.array([[random.random()], [random.random()], [random.random()]]), 0.005)
+plot_gradient()
+arr = get_pseudo_random_weights()
+a = arr[0]
+b = arr[1]
+c = arr[2]
+optimize_decision_boundary(np.array([[a], [b], [c]]), 0.005)
