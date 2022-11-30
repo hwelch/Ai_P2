@@ -147,6 +147,7 @@ def plot_all_bounds(title, w1, w2, w3):
     plt.ylabel('Petal Width')
     plt.xlabel('Petal Length')
     plt.title(title)
+    # plt.suptitle("test")
     plt.xlim([2.90, 7.1])
     plt.ylim(0.9, 2.58)
     x_axis = np.arange(2.9, 7.1, 0.1)
@@ -192,11 +193,11 @@ def optimize_decision_boundary(initial_weights, epsilon):
         if iterations == 6000:
             middle_bound_weight = w
         print(curr_diff)
-    plot_all_bounds("Data with Boundaries", initial_weights, middle_bound_weight, w)
+    plot_all_bounds(f'Random weights of\nw0={round(initial_weights[0][0], 3)}, w1={round(initial_weights[1][0], 3)}, w2={round(initial_weights[2][0], 3)}', initial_weights, middle_bound_weight, w)
     plot_classes("Final Boundary", w[0], w[1], w[2], "Decision Boundary")
     plot_iterations(np.arange(iterations), np.array(errs))
 
 
 initialize_params()
 # plot_gradient()
-optimize_decision_boundary(np.array([[-8.8], [1.1], [2]]), 0.005)
+optimize_decision_boundary(np.array([[random.random()], [random.random()], [random.random()]]), 0.005)
